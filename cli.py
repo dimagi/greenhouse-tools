@@ -14,7 +14,7 @@ Go to https://app.greenhouse.io/configure/dev_center/credentials to find your AP
 '''
 
 
-def run_cli(api_key, output_filename=None):
+def run_cli(api_key, output_file=None):
     print('starting the greenhouse command line interface... welcome!')
     client = GreenhouseClient(api_key)
     jobs = client.list_jobs()
@@ -37,20 +37,21 @@ def run_cli(api_key, output_filename=None):
         #     break
         print('processed {}/{} applications (found {} total score cards)'.format(i, len(applications), total_scorecards_found))
 
-    serialize_scorecards_to_file(all_scorecards, output_file=output_filename)
+    output_file = output_file or 'output/{} - scorecards.csv'.format(job_to_string(chosen_job))
+    serialize_scorecards_to_file(all_scorecards, output_file)
 
 
 def job_to_string(job):
     return '{} in {} (created: {})'.format(job['title'], job['location']['name'], job['created_at'][:10])
 
 
-def serialize_scorecards_to_file(all_scorecards, output_file=None):
-    output_file = output_file or 'output/scorecards.csv'
-    try:
-        os.makedirs(os.path.dirname(output_file))
-    except FileExistsError:
-        # directory already exists
-        pass
+def serialize_scorecards_to_file(all_scorecards, output_file):
+    if os.path.dirname(output_file):
+        try:
+            os.makedirs(os.path.dirname(output_file))
+        except FileExistsError:
+            # directory already exists
+            pass
 
     # first we have to collect all potential attributes
     all_attributes, flat_scorecards = collect_attributes_and_flatten_scorecards(all_scorecards)
@@ -97,5 +98,5 @@ if __name__ == "__main__":
         print(USAGE)
         sys.exit(0)
     api_key = sys.argv[1]
-    output_file = sys.argv[2] if len(sys.argv) > 2 else None
-    run_cli(api_key, output_file)
+    output_file_arg = sys.argv[2] if len(sys.argv) > 2 else None
+    run_cli(api_key, output_file_arg)

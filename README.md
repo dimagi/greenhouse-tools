@@ -55,4 +55,4 @@ python cli.py <api_key> [output file]
 ``` 
 
 and follow the instructions! If you do not specify an output file, 
-your output will be saved to `output/scorecards.csv`.
+your output will be saved with the job title to the `output/` directory.
